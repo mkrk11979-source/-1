@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ЛингвоАссистент: Культурная Речь</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-border: #334155;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-light: rgba(99, 102, 241, 0.15);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 12px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: 24px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 4px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #fff;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+
+    /* Card Layouts */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Word of the day */
+    .wod-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 1) 0%, rgba(49, 46, 129, 0.4) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wod-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #a5b4fc;
+      margin-bottom: 6px;
+    }
+
+    .wod-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+
+    .wod-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Search Box */
+    .search-box {
+      display: flex;
+      gap: 8px;
+      position: relative;
+    }
+
+    .input-wrapper {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--card);
+      border: 1.5px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px 44px 14px 16px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .mic-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mic-btn.recording {
+      color: var(--danger);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: translateY(-50%) scale(1); }
+      50% { transform: translateY(-50%) scale(1.2); }
+      100% { transform: translateY(-50%) scale(1); }
+    }
+
+    .submit-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 0 20px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .submit-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Filters / Tags */
+    .filters-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .filters-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-chip {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter-chip.active {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 500;
+    }
+
+    /* Results Card */
+    .results-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .badge-yellow { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .badge-red { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+    .fav-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .fav-btn.active {
+      color: var(--warning);
+    }
+
+    .synonyms-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .synonym-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .synonym-text {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    .synonym-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mini-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+    }
+
+    .mini-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .info-block {
+      border-top: 1px solid var(--card-border);
+      padding-top: 12px;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.88rem;
+    }
+
+    .info-row {
+      line-height: 1.4;
+      color: var(--text-muted);
+    }
+
+    .info-row strong {
+      color: var(--text);
+    }
+
+    /* Fact Box */
+    .fact-card {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px dashed var(--accent);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+
+    .fact-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #a5b4fc;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .fact-title {
+      font-weight: 700;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    .fact-body {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* Drawer / Modal */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+      z-index: 100;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card);
+      width: 100%;
+      max-width: 480px;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      padding: 20px;
+      max-height: 80vh;
+      overflow-y: auto;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .fav-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .api-input {
+      width: 100%;
+      padding: 10px;
+      background: var(--bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: #fff;
+      margin: 10px 0 16px 0;
+    }
+
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--accent);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <div class="logo-icon">Л</div>
+        <span>ЛингвоАссистент</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="favs-btn" title="Избранное">⭐</button>
+        <button class="icon-btn" id="settings-btn" title="Настройки API">⚙️</button>
+      </div>
+    </header>
+
+    <!-- Word of the day -->
+    <div class="card wod-card" id="wod-section">
+      <div class="wod-tag">💡 Слово дня</div>
+      <div class="wod-title" id="wod-word">Эвфемизм</div>
+      <div class="wod-desc" id="wod-desc">Нейтральное по смыслу и эмоциональной полутени слово или выражение, используемое вместо неприличных или резких слов.</div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-box">
+      <div class="input-wrapper">
+        <input type="text" class="search-input" id="search-input" placeholder="Введите слово или фразу..." autocomplete="off">
+        <button class="mic-btn" id="mic-btn" title="Голосовой ввод">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </button>
+      </div>
+      <button class="submit-btn" id="search-btn">Найти</button>
+    </div>
+
+    <!-- Tone Filters -->
+    <div class="filters-scroll">
+      <button class="filter-chip active" data-tone="work">💼 Для работы</button>
+      <button class="filter-chip" data-tone="friends">💬 Разговорный</button>
+      <button class="filter-chip" data-tone="witty">🎭 Ироничный</button>
+      <button class="filter-chip" data-tone="brief">⚡ В двух словах</button>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-spinner" id="loader">
+      <div class="spinner"></div>
+      Подбираем безупречные аналоги...
+    </div>
+
+    <!-- Results Area -->
+    <div class="results-container" id="results-area" style="display: none;">
+      <div class="card">
+        <div class="result-header">
+          <span class="badge badge-yellow" id="res-badge">🟡 Умеренная резкость</span>
+          <button class="fav-btn" id="add-fav-btn">⭐</button>
+        </div>
+
+        <div class="synonyms-list" id="synonyms-list">
+          <!-- Dynamic synonyms -->
+        </div>
+
+        <div class="info-block">
+          <div class="info-row" id="res-context"><strong>Контекст:</strong> Бытовая замена выражений высокой экспрессии.</div>
+          <div class="info-row" id="res-usage"><strong>Где уместно:</strong> В разговорной речи с друзьями или коллегами при близком общении.</div>
+        </div>
+      </div>
+
+      <!-- Fact Card -->
+      <div class="fact-card" id="fact-section">
+        <div class="fact-header">✨ Интересный факт / Заимствование</div>
+        <div class="fact-title" id="fact-title">Schadenfreude (Шаденфройде)</div>
+        <div class="fact-body" id="fact-body">Немецкий термин, обозначающий злорадство — удовольствие, получаемое при известии о неудачах других. В русском языке емкого однословного аналога нет.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favorites Modal -->
+  <div class="modal" id="modal-favs">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Мой личный словарь</div>
+        <button class="close-btn" class="modal-close">&times;</button>
+      </div>
+      <div id="favs-container">
+        <!-- Dynamic favs -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="modal-settings">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Настройки API</div>
+        <button class="close-btn" class="modal-close">&times;</button>
+      </div>
+      <p style="font-size:0.85rem; color: var(--text-muted);">Введите API-ключ OpenAI (или совместимого API) для генерации ответов через нейросеть. Если ключ не введен, приложение работает в демонстрационном (Mock) режиме.</p>
+      <input type="password" class="api-input" id="api-key-input" placeholder="sk-...">
+      <button class="submit-btn" style="width:100%; padding:12px;" id="save-settings-btn">Сохранить</button>
+    </div>
+  </div>
+
+  <script>
+    // App State
+    let apiKey = localStorage.getItem('lingvo_api_key') || '';
+    let currentTone = 'work';
+    let favorites = JSON.parse(localStorage.getItem('lingvo_favs') || '[]');
+    let currentResultData = null;
+
+    // Elements
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const micBtn = document.getElementById('mic-btn');
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const loader = document.getElementById('loader');
+    const resultsArea = document.getElementById('results-area');
+    const synonymsList = document.getElementById('synonyms-list');
+    const resBadge = document.getElementById('res-badge');
+    const resContext = document.getElementById('res-context');
+    const resUsage = document.getElementById('res-usage');
+    const factTitle = document.getElementById('fact-title');
+    const factBody = document.getElementById('fact-body');
+    const addFavBtn = document.getElementById('add-fav-btn');
+
+    // Modals
+    const modalFavs = document.getElementById('modal-favs');
+    const modalSettings = document.getElementById('modal-settings');
+    const favsBtn = document.getElementById('favs-btn');
+    const settingsBtn = document.getElementById('settings-btn');
+    const apiKeyInput = document.getElementById('api-key-input');
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+
+    // Setup Initial State
+    apiKeyInput.value = apiKey;
+
+    // Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'ru-RU';
+      recognition.interimResults = false;
+
+      recognition.onstart = () => micBtn.classList.add('recording');
+      recognition.onend = () => micBtn.classList.remove('recording');
+      recognition.onresult = (e) => {
+        const text = e.results[0][0].transcript;
+        searchInput.value = text;
+        handleSearch();
+      };
+    } else {
+      micBtn.style.display = 'none';
+    }
+
+    micBtn.addEventListener('click', () => {
+      if (!recognition) return;
+      try { recognition.start(); } catch(e) { recognition.stop(); }
+    });
+
+    // TTS
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ru-RU';
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Filter Tag Handlers
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentTone = chip.dataset.tone;
+        if (searchInput.value.trim()) handleSearch();
+      });
+    });
+
+    // Search Trigger
+    searchBtn.addEventListener('click', handleSearch);
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSearch();
+    });
+
+    // Main Search Logic
+    async function handleSearch() {
+      const query = searchInput.value.trim();
+      if (!query) return;
+
+      loader.style.display = 'block';
+      resultsArea.style.display = 'none';
+
+      let data = null;
+
+      if (apiKey) {
+        data = await fetchAIResponse(query, currentTone);
+      } 
+      
+      if (!data) {
+        // Fallback Mock Data
+        data = getMockData(query, currentTone);
+      }
+
+      renderResults(query, data);
+      loader.style.display = 'none';
+      resultsArea.style.display = 'flex';
+    }
+
+    // Render Function
+    function renderResults(query, data) {
+      currentResultData = { query, ...data };
+      
+      // Badge
+      resBadge.className = `badge ${data.badgeClass}`;
+      resBadge.textContent = data.badgeText;
+
+      // Synonyms
+      synonymsList.innerHTML = '';
+      data.synonyms.forEach(syn => {
+        const item = document.createElement('div');
+        item.className = 'synonym-item';
+        item.innerHTML = `
+          <span class="synonym-text">${syn}</span>
+          <div class="synonym-actions">
+            <button class="mini-btn" onclick="speak('${syn}')" title="Озвучить">🔊</button>
+            <button class="mini-btn" onclick="copyToClipboard('${syn}')" title="Скопировать">📋</button>
+          </div>
+        `;
+        synonymsList.appendChild(item);
+      });
+
+      // Info
+      resContext.innerHTML = `<strong>Контекст:</strong> ${data.context}`;
+      resUsage.innerHTML = `<strong>Где уместно:</strong> ${data.usage}`;
+
+      // Fact
+      factTitle.textContent = data.fact.title;
+      factBody.textContent = data.fact.body;
+
+      // Fav icon update
+      const isFav = favorites.some(f => f.query.toLowerCase() === query.toLowerCase());
+      addFavBtn.classList.toggle('active', isFav);
+    }
+
+    // Mock Response Generator
+    function getMockData(word, tone) {
+      const isWork = tone === 'work';
+      const isWitty = tone === 'witty';
+
+      return {
+        badgeClass: 'badge-yellow',
+        badgeText: '🟡 Разговорная экспрессия',
+        synonyms: isWork 
+          ? ['Некомпетентный сотрудник', 'Дезориентированный специалист', 'Небрежный исполнитель']
+          : isWitty 
+          ? ['Стратег от Бога', 'Мастер нетривиальных решений', 'Гений чистой нелепости']
+          : ['Невнимательный человек', 'Растяпа', 'Путаник'],
+        context: `Используется для характеристики человека, допустившего глупую ошибку или проявившего халатность относительно слова "${word}".`,
+        usage: isWork ? 'Исключительно в деловой переписке или конструктивной критике.' : 'В неформальном общении без прямого намерения оскорбить.',
+        fact: {
+          title: 'Abderite (Абдерит)',
+          body: 'Заимствование из греческого языка: житель древнего города Абдеры, в фольклоре считавшийся глупцом. Используется как ироничный лингвистический аналог.'
+        }
+      };
+    }
+
+    // AI API Call Function
+    async function fetchAIResponse(word, tone) {
+      const systemPrompt = `Ты — опытный лингвист. Пользователь ввел слово или фразу: "${word}".
+Твоя задача — нейтрально проанализировать слово (включая ненормативную лексику) и предложить культурные альтернативы.
+Выбранный стиль: ${tone}.
+
+Верни ответ СТРОГО в формате JSON без кавычек markdown:
+{
+  "badgeClass": "badge-green" (если нейтрально) или "badge-yellow" (если умеренно) или "badge-red" (если грубое/обидное),
+  "badgeText": "краткое обозначение степени грубости",
+  "synonyms": ["синоним 1", "синоним 2", "синоним 3"],
+  "context": "краткое пояснение эмоциональной окраски и смысла",
+  "usage": "где и с кем это слово уместно использовать",
+  "fact": {
+    "title": "Иностранный термин или фразеологизм (Транскрипция)",
+    "body": "краткое пояснение концепта для расширения кругозора"
+  }
+}`;
+
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [{ role: 'system', content: systemPrompt }],
+            temperature: 0.7
+          })
+        });
+
+        const resData = await response.json();
+        const content = resData.choices[0].message.content;
+        return JSON.parse(content);
+      } catch (err) {
+        console.error('API Error:', err);
+        return null;
+      }
+    }
+
+    // Favorites Logic
+    addFavBtn.addEventListener('click', () => {
+      if (!currentResultData) return;
+      
+      const index = favorites.findIndex(f => f.query.toLowerCase() === currentResultData.query.toLowerCase());
+      if (index >= 0) {
+        favorites.splice(index, 1);
+        addFavBtn.classList.remove('active');
+      } else {
+        favorites.push(currentResultData);
+        addFavBtn.classList.add('active');
+      }
+      localStorage.setItem('lingvo_favs', JSON.stringify(favorites));
+      renderFavsList();
+    });
+
+    function renderFavsList() {
+      const container = document.getElementById('favs-container');
+      if (favorites.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Ваш личный словарь пока пуст.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+      favorites.forEach((fav, i) => {
+        const div = document.createElement('div');
+        div.className = 'fav-item';
+        div.innerHTML = `
+          <div>
+            <strong style="color:#fff;">${fav.query}</strong>
+            <div style="font-size:0.8rem; color:var(--text-muted);">${fav.synonyms.join(', ')}</div>
+          </div>
+          <button class="mini-btn" onclick="removeFav(${i})">🗑️</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    window.removeFav = function(index) {
+      favorites.splice(index, 1);
+      localStorage.setItem('lingvo_favs', JSON.stringify(favorites));
+      renderFavsList();
+      if (currentResultData && favorites.findIndex(f => f.query.toLowerCase() === currentResultData.query.toLowerCase()) === -1) {
+        addFavBtn.classList.remove('active');
+      }
+    };
+
+    // Utils
+    window.copyToClipboard = function(text) {
+      navigator.clipboard.writeText(text);
+      alert(`Скопировано: "${text}"`);
+    };
+
+    // Modals controls
+    favsBtn.addEventListener('click', () => { renderFavsList(); modalFavs.classList.add('open'); });
+    settingsBtn.addEventListener('click', () => modalSettings.classList.add('open'));
+    
+    document.querySelectorAll('.close-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        modalFavs.classList.remove('open');
+        modalSettings.classList.remove('open');
+      });
+    });
+
+    saveSettingsBtn.addEventListener('click', () => {
+      apiKey = apiKeyInput.value.trim();
+      localStorage.setItem('lingvo_api_key', apiKey);
+      modalSettings.classList.remove('open');
+      alert(apiKey ? 'API ключ сохранен!' : 'Работаем в демонстрационном режиме.');
+    });
+  </script>
+</body>
+</html>
